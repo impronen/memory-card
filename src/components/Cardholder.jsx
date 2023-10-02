@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
+import imageStoragePopulator from "../helpers/helpers";
+import Card from "./Card";
 
 export default function CardHolder() {
-  const searchTerm = "tundra";
+  const searchTerm = "nordics";
+  const orientation = "landscape";
   const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
-  const apiQueryUrl = `https://api.unsplash.com/search/photos?query=${searchTerm}`;
+  const apiQueryUrl = `https://api.unsplash.com/search/photos?query=${searchTerm}&orientation=${orientation}`;
 
   const [imageStorage, setImageStorage] = useState({
-    imageStorage: [], //TODO: refactor this to be not just for URLs but all image data
+    storage: [],
     currentScore: 0,
     highScore: 0,
   });
@@ -21,8 +24,14 @@ export default function CardHolder() {
           throw new Error(`Request failed, status: ${apiResponse.status}`);
         const imageData = await apiResponse.json();
         console.log(imageData);
-        // helper that chooses 9 random image URL's and populates imageStorage
-        // with objects created from those
+        const imageObjects = imageStoragePopulator(imageData);
+        console.log(imageObjects);
+
+        setImageStorage((prevState) => ({
+          ...prevState,
+          storage: imageObjects,
+        }));
+        console.log("Updated Image Storage:", imageStorage);
       } catch (error) {
         console.error("Something is wrong", error);
       }
@@ -31,8 +40,10 @@ export default function CardHolder() {
 
   return (
     <>
-      <div>
-        <p>text new</p>
+      <div className="imageContainer">
+        {imageStorage.storage.map((image) => (
+          <Card key={image.id} {...image} />
+        ))}
       </div>
     </>
   );
