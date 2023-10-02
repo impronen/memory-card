@@ -11,3 +11,7 @@ export default function imageStoragePopulator(imageData) {
   }
   return dataArray;
 }
+
+export function randomSearchTerm(termArray) {
+  return termArray[(Math.random() * termArray.length) | 0];
+}

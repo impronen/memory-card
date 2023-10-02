@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import imageStoragePopulator from "../helpers/helpers";
+import { randomSearchTerm } from "../helpers/helpers";
 import Card from "./Card";
 
 export default function CardHolder() {
-  const searchTerm = "nordics";
+  const searchTerms = [
+    "finland lapland winter",
+    "finland lake",
+    "finland  sunrise",
+    "finland birch forest summer",
+    "finland winter forest",
+  ];
+
   const orientation = "landscape";
   const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
-  const apiQueryUrl = `https://api.unsplash.com/search/photos?query=${searchTerm}&orientation=${orientation}`;
 
+  const [searchTerm, setSearchTerm] = useState(randomSearchTerm(searchTerms));
   const [imageStorage, setImageStorage] = useState({
     storage: [],
     currentScore: 0,
@@ -15,6 +23,8 @@ export default function CardHolder() {
   });
 
   useEffect(() => {
+    console.log(searchTerm);
+    const apiQueryUrl = `https://api.unsplash.com/search/photos?query=${searchTerm}&orientation=${orientation}`;
     (async () => {
       try {
         const apiResponse = await fetch(apiQueryUrl, {
@@ -23,9 +33,8 @@ export default function CardHolder() {
         if (!apiResponse.ok)
           throw new Error(`Request failed, status: ${apiResponse.status}`);
         const imageData = await apiResponse.json();
-        console.log(imageData);
+
         const imageObjects = imageStoragePopulator(imageData);
-        console.log(imageObjects);
 
         setImageStorage((prevState) => ({
           ...prevState,
@@ -36,11 +45,12 @@ export default function CardHolder() {
         console.error("Something is wrong", error);
       }
     })();
-  }, [accessKey, apiQueryUrl]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessKey, searchTerm]); // Include searchTerm as a dependency
 
   return (
     <>
-      <div className="imageContainer">
+      <div className="imageContainer flex flex-row flex-wrap">
         {imageStorage.storage.map((image) => (
           <Card key={image.id} {...image} />
         ))}
