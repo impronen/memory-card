@@ -1,4 +1,4 @@
-export default function imageStoragePopulator(imageData) {
+export function imageStoragePopulator(imageData) {
   let dataArray = [];
   for (const item of imageData.results) {
     dataArray.push({
@@ -14,4 +14,12 @@ export default function imageStoragePopulator(imageData) {
 
 export function randomSearchTerm(termArray) {
   return termArray[(Math.random() * termArray.length) | 0];
+}
+
+export function randomOrderer(storageArray) {
+  let newArray = storageArray
+    .map((value) => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value);
+  return newArray;
 }
