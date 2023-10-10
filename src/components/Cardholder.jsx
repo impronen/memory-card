@@ -1,26 +1,38 @@
 import { useEffect, useState } from "react";
-import imageStoragePopulator from "../helpers/helpers";
-import { randomSearchTerm } from "../helpers/helpers";
+import {
+  imageStoragePopulator,
+  randomSearchTerm,
+  randomOrderer,
+} from "../helpers/helpers";
+
 import Card from "./Card";
 
 export default function CardHolder() {
   const searchTerms = [
     "finland lapland winter",
     "finland lake",
-    "finland  sunrise",
+    "finland nature sunrise",
     "finland birch forest summer",
     "finland winter forest",
   ];
-
   const orientation = "landscape";
   const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 
+  // eslint-disable-next-line no-unused-vars
   const [searchTerm, setSearchTerm] = useState(randomSearchTerm(searchTerms));
   const [imageStorage, setImageStorage] = useState({
     storage: [],
     currentScore: 0,
     highScore: 0,
   });
+
+  function handleClick(e) {
+    const newOrder = randomOrderer(imageStorage.storage);
+    setImageStorage((prevState) => ({
+      ...prevState,
+      storage: newOrder,
+    }));
+  }
 
   useEffect(() => {
     console.log(searchTerm);
@@ -40,7 +52,6 @@ export default function CardHolder() {
           ...prevState,
           storage: imageObjects,
         }));
-        console.log("Updated Image Storage:", imageStorage);
       } catch (error) {
         console.error("Something is wrong", error);
       }
@@ -52,7 +63,7 @@ export default function CardHolder() {
     <>
       <div className="imageContainer flex flex-row flex-wrap">
         {imageStorage.storage.map((image) => (
-          <Card key={image.id} {...image} />
+          <Card key={image.id} {...image} onClick={handleClick} />
         ))}
       </div>
     </>
