@@ -22,11 +22,20 @@ export default function CardHolder() {
   const [searchTerm, setSearchTerm] = useState(randomSearchTerm(searchTerms));
   const [imageStorage, setImageStorage] = useState({
     storage: [],
+    clickedImages: [],
     currentScore: 0,
     highScore: 0,
   });
 
-  function handleClick(e) {
+  function handleClick(id) {
+    console.log(id);
+    if (
+      imageStorage.clickedImages.some((clickedImage) => id === clickedImage)
+    ) {
+      resetScore();
+    } else {
+      logCorrectClick(id);
+    }
     const newOrder = randomOrderer(imageStorage.storage);
     setImageStorage((prevState) => ({
       ...prevState,
@@ -34,8 +43,31 @@ export default function CardHolder() {
     }));
   }
 
+  function resetScore() {
+    setImageStorage((prevState) => ({
+      ...prevState,
+      clickedImages: [],
+      currentScore: 0,
+    }));
+  }
+
+  function logCorrectClick(id) {
+    setImageStorage((prevState) => {
+      const newScore = prevState.currentScore + 1;
+      const newHighScore =
+        newScore > prevState.highScore ? newScore : prevState.highScore;
+
+      const newState = {
+        ...prevState,
+        clickedImages: [...prevState.clickedImages, id],
+        currentScore: newScore,
+        highScore: newHighScore,
+      };
+      return newState;
+    });
+  }
+
   useEffect(() => {
-    console.log(searchTerm);
     const apiQueryUrl = `https://api.unsplash.com/search/photos?query=${searchTerm}&orientation=${orientation}`;
     (async () => {
       try {
@@ -61,7 +93,11 @@ export default function CardHolder() {
 
   return (
     <>
-      <div className="imageContainer flex flex-row flex-wrap">
+      <div className="flex flex-row flex-wrap justify-around pn-10">
+        <h2>Current Score: {imageStorage.currentScore}</h2>
+        <h2>High Score: {imageStorage.highScore}</h2>
+      </div>
+      <div className="imageContainer flex flex-row flex-wrap py-8 ">
         {imageStorage.storage.map((image) => (
           <Card key={image.id} {...image} onClick={handleClick} />
         ))}

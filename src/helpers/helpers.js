@@ -1,5 +1,6 @@
 export function imageStoragePopulator(imageData) {
   let dataArray = [];
+
   for (const item of imageData.results) {
     dataArray.push({
       id: item.id,
@@ -9,7 +10,7 @@ export function imageStoragePopulator(imageData) {
       portfolio: `https://unsplash.com/@${item.user.username}`,
     });
   }
-  return dataArray;
+  return dataArray.slice(0, 9);
 }
 
 export function randomSearchTerm(termArray) {
